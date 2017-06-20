@@ -355,7 +355,7 @@ function addVideoDetails(videoDiv, video) {
   var likeCountDiv = document.createElement('div');
   likeCountDiv.classList.add('count');
   likeCountDiv.innerHTML = '<strong>Likes: </strong>' +
-    video.likeCount.toLocaleString();
+    video.likeCount.toLocaleString(); // toLocaleString() formats numbers
   details.appendChild(likeCountDiv);
 
   var dislikeCountDiv = document.createElement('div');
@@ -366,8 +366,10 @@ function addVideoDetails(videoDiv, video) {
 
   var commentCountDiv = document.createElement('div');
   commentCountDiv.classList.add('count');
+  var commentCountString = video.commentCount ?
+    video.commentCount.toLocaleString() : 0;
   commentCountDiv.innerHTML = '<strong>Comments: </strong>' +
-    video.commentCount.toLocaleString();
+    commentCountString;
   details.appendChild(commentCountDiv);
 
   var viewCountDiv = document.createElement('div');
