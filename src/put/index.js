@@ -545,7 +545,7 @@ var ignoredspeakers = ['Audience', 'Audience member', 'Male Speaker',
   'Female Speaker', 'All', 'Playback', 'Man', 'Announcer', 'Moderator',
   'Producer', 'Fundamentals', 'Female Voice', 'Together', 'Male Voice',
   'Male Speakers', 'Cameraman', 'Unknown Speaker', 'Moderator', 'Remember',
-  'The', 'Describer', 'Caller'
+  'The', 'Describer', 'Caller', 'Offscreen'
 ];
 
 function isSpeakerAllowed(speaker) {
