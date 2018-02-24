@@ -28,7 +28,7 @@ google.options({
 
 var youtube = google.youtube('v3');
 var MAXRESULTS = 50; // for YouTube Data API requests
-var FUDGEFACTOR = 20; // see below: YouTube Data API totalResuls is an estimate :(
+var FUDGEFACTOR = 20; // see below: YouTube Data API totalResuls is estimate :(
 
 var moment = require('moment');
 var request = require('request');
@@ -91,13 +91,13 @@ function main() {
   request.del(dbStagingUrl, function(error, response, body) {
     if (!error && response.statusCode === 200) {
       console.log('Successfully deleted database: ' + body);
-      request.put(dbStagingUrl, function(error, response, body) {
-        if (!error && response.statusCode === 201) {
-          console.log('Successfully created database: ' + body);
+      request.put(dbStagingUrl, function(putError, putResponse, putBody) {
+        if (!putError && putResponse.statusCode === 201) {
+          console.log('Successfully created database: ' + putBody);
           insertDesignDoc();
           getVideoIds(); // starts process of getting video data and captions
         } else {
-          console.log('Error creating database: ', error, response);
+          console.log('Error creating database: ', putError, putResponse);
         }
       });
     } else {
@@ -133,7 +133,7 @@ function getVideoIds() {
       part: 'contentDetails ',
       playlistId: playlistIds[i]
     };
-    // Get video IDs for all channels in batches of 50 (or whatever MAXRESULTS is)
+    // Get video IDs for all channels in batches of 50 (or whatever MAXRESULTS)
     getPlaylistItems(params);
   }
 }
@@ -187,7 +187,7 @@ function handlePlaylistItemData(error, data, params) {
   }, 1000);
 }
 
-// Get data for a batch of videos (passed as a string of comma-separated video IDs)
+// Get data for batch of videos, passed as a string of comma-separated video IDs
 function getVideoData(videoIds) {
   var params = {
     id: videoIds,
@@ -205,8 +205,8 @@ function handleVideoData(error, data, params) {
     console.error('Re-getting video data following error: ' +
       JSON.stringify(error));
     setTimeout(function() {
-      youtube.videos.list(params, function(error, data) {
-        handleVideoData(error, data, params);
+      youtube.videos.list(params, function(listError, listData) {
+        handleVideoData(listError, listData, params);
       });
     }, 1000);
     return;
@@ -273,10 +273,10 @@ function getTranscript(index, useAlternativeUrl) {
     }
     request({
       uri: transcriptUrl,
-      timeout: 5000, // getting captions via unofficial API intermittently fails :(
+      timeout: 5000, // captions via unofficial API intermittently fails :(
     }, function(error, response, body) {
       handleTranscript(error, response, body, index, transcriptUrl);
-    }) /*.end()*/ ;
+    }) /* .end() */ ;
   }
 }
 
@@ -323,32 +323,32 @@ function handleTranscript(error, response, body, index, transcriptUrl) {
 
 function tweakTranscriptText(body) {
   return body.
-  replace(/<text[^\/]+>\s*<\/text>/gm, ''). // remove empty captions
-  replace(/\n/gm, ' ').
-  replace(/>>> /gm, 'Audience member: ').
-  replace(/&gt;&gt; ?/gm, '').
-  replace(/&amp;gt;&amp;gt; ?/gm, '').
-  replace(/&amp;gt; ?/gm, '').
-  replace(/AUDIENCE/, 'Audience').
-  replace(/AUDIENCE MEMBER/, 'Audience member').
-  replace(/^>+/gm, '').
-  replace(/&#39;/gm, '\'').
-  replace(/&amp;#39;/gm, '\'').
-  replace(/&quot;/gm, '\'').
-  replace(/&amp;quot;/gm, '\'').
-  replace('<?xml version="1.0" encoding="utf-8" ?><transcript>', '').
-  replace('</transcript>', '').
-  replace(/ dur="[^"]+"/gm, '').
-  replace(/<text start/gm, '<span data-start').
-  replace(/<\/text>/gm, ' </span>'). // add a space at end of each span
-  replace(/--/gm, ' &mdash; ').
-  replace(/ - /gm, ' &mdash; ').
-  replace(/\\r\\n/gm, '<br>').
-  replace(/\\n/gm, '<br>').
-  replace(/\s{2,}/gm, ' ').
-  replace(
-    /">(([A-Z][A-Za-z\-]+)|([A-Z][A-Za-z\-]+ [A-Z][A-Za-z\-]+)|([A-Z\-]+\s?[A-Z-]*)):/gm,
-    handleSpeakerMatch); // build array of speakers
+    replace(/<text[^/]+>\s*<\/text>/gm, ''). // remove empty captions
+    replace(/\n/gm, ' ').
+    replace(/>>> /gm, 'Audience member: ').
+    replace(/&gt;&gt; ?/gm, '').
+    replace(/&amp;gt;&amp;gt; ?/gm, '').
+    replace(/&amp;gt; ?/gm, '').
+    replace(/AUDIENCE/, 'Audience').
+    replace(/AUDIENCE MEMBER/, 'Audience member').
+    replace(/^>+/gm, '').
+    replace(/&#39;/gm, '\'').
+    replace(/&amp;#39;/gm, '\'').
+    replace(/&quot;/gm, '\'').
+    replace(/&amp;quot;/gm, '\'').
+    replace('<?xml version="1.0" encoding="utf-8" ?><transcript>', '').
+    replace('</transcript>', '').
+    replace(/ dur="[^"]+"/gm, '').
+    replace(/<text start/gm, '<span data-start').
+    replace(/<\/text>/gm, ' </span>'). // add a space at end of each span
+    replace(/--/gm, ' &mdash; ').
+    replace(/ - /gm, ' &mdash; ').
+    replace(/\\r\\n/gm, '<br>').
+    replace(/\\n/gm, '<br>').
+    replace(/\s{2,}/gm, ' ').
+    replace(
+      /">(([A-Z][A-Za-z\-]+)|([A-Z][A-Za-z\-]+ [A-Z][A-Za-z\-]+)|([A-Z\-]+\s?[A-Z-]*)):/gm,
+      handleSpeakerMatch); // build array of speakers
 }
 
 function handleSpeakerMatch(match, submatch1) {
@@ -365,7 +365,7 @@ function handleSpeakerMatch(match, submatch1) {
 function buildTranscript(transcript) {
   // for each new speaker, start a new paragraph
   // add @$* string to enable paragraphs to be split into an array below
-  transcript = transcript.replace(/><span([^\/]+)<span class="speaker">/gm,
+  transcript = transcript.replace(/><span([^/]+)<span class="speaker">/gm,
     '>@£$<span$1<span class="speaker">');
 
   // split into array of paragraphs
@@ -388,7 +388,7 @@ function buildTranscript(transcript) {
 
 function split(para, MAXLENGTH) {
   // split after the end of each sentence
-  // each sentence ends with a full stop and space followed by a span closing tag
+  // each sentence ends with full stop and space followed by a span closing tag
   var sentences = para.replace(/\. <\/span>/g, '. </span>%^&*').split('%^&*');
   var paras = [];
   var tempPara = '';
@@ -447,8 +447,8 @@ function handleBulkInsert(error, response, body, options) {
       console.log(body.error, body.reason);
     }
     setTimeout(function() {
-      request(options, function(error, response, body) {
-        handleBulkInsert(error, response, body, options);
+      request(options, function(requestError, requestResponse, requestBody) {
+        handleBulkInsert(requestError, requestResponse, requestBody, options);
       });
     }, 1000);
     return;
@@ -471,72 +471,72 @@ function handleBulkInsert(error, response, body, options) {
 function tweakName(name) {
   name = capitalize(name);
   return name.replace('^Wiltzius$', 'Tom Wiltzius').
-  replace('Chris Dibona', 'Chris DiBona').
-  replace('Colt Mcanlis', 'Colt McAnlis').
-  replace('John Mccutchan', 'John McCutchan').
-  replace('John Mcgowan', 'John McGowan').
-  replace('Kc Austin', 'KC Austin').
-  replace('Mcnulty', 'McNulty').
-  replace('Pete Beverloo', 'Peter Beverloo').
-  replace('Pete Lepage', 'Pete LePage').
-  replace('Rich Hyndman', 'Richard Hyndman').
-  replace('Richard Felcher', 'Richard Fulcher').
-  replace('Richard Hyman', 'Richard Hyndman').
-  replace('Tv Raman', 'TV Raman').
-  replace(/^Aleksey$/, 'Alexis Moussine-Pouchkine').
-  replace(/^Alexis Moussine Pouchkine$/, 'Alexis Moussine-Pouchkine').
-  replace(/^Bidelman$/, 'Eric Bidelman').
-  replace(/^Bjorn$/, 'Björn Melinder').
-  replace(/^Brin$/, 'Sergey Brin').
-  replace(/^Colt Mcanis$/, 'Colt McAnlis').
-  replace(/^Cromwell$/, 'Ray Cromwell').
-  replace(/^Dan$/, 'Dan Galpin').
-  replace(/^Divya Mannian$/, 'Divya Manian').
-  replace(/^Feldman$/, 'Pavel Feldman').
-  replace(/^Fette$/, 'Ian Fette').
-  replace(/^Fisher$/, 'Darin Fisher').
-  replace(/^Grace$/, 'Grace Kloba').
-  replace(/^Glazkov$/, 'Dimitri Glazkov').
-  replace(/^Gundotra$/, 'Vic Gundotra').
-  replace(/^Ilya$/, 'Ilya Grigorik').
-  replace(/^Irish$/, 'Paul Irish').
-  replace(/^Jake$/, 'Jake Archibald').
-  replace(/^Justin$/, 'Justin Uberti').
-  replace(/^Kay$/, 'Erik Kay').
-  replace(/^Larry$/, 'Larry Page').
-  replace(/^Malanet$/, 'Mallinath Bareddy').
-  replace(/^Matthew Gaunt$/, 'Matt Gaunt').
-  replace(/^Matt MCneill$/, 'Matt McNeill').
-  replace(/^Mc$/, 'MC').
-  replace(/^Natasha$/, 'Natasha Rooney').
-  replace(/^Nick$/, 'Nick Butcher').
-  replace(/^Nurik$/, 'Roman Nurik').
-  replace(/^Pamela$/, 'Pamela Fox').
-  replace(/^Papakipos$/, 'Matt Papakipos').
-  replace(/^Per$/, 'Per Emanuelsson').
-  replace(/^Pete Lapage$/, 'Pete LePage').
-  replace(/^Rahul$/, 'Rahul Roy-chowdhury').
-  replace(/^Raman$/, 'TV Raman').
-  replace(/^Ray$/, 'Ray Punyabrata').
-  replace(/^Roman$/, 'Roman Nurik').
-  replace(/^Roomann-Kurrik$/, 'Arne Roomann-Kurrik').
-  replace(/^Sam$/, 'Sam Dutton').
-  replace(/^Schmidt$/, 'Eric Schmidt').
-  replace(/^Shanee Nistry$/, 'Shanee Nishry').
-  replace(/^Shanee$/, 'Shanee Nishry').
-  replace(/^Souder$/, 'Steve Souders').
-  replace(/^Souders$/, 'Steve Souders').
-  replace(/^Sparky$/, 'Sparky Rhode').
-  replace(/^Terrence$/, 'Terrence Eden').
-  replace(/^Todd$/, 'Todd Kerpelman').
-  replace(/^Tom$/, 'Tommy Widenflycht').
-  replace(/^Urs Hlzle$/, 'Urs Hölzle').
-  replace(/^Urs Hoelzle$/, 'Urs Hölzle').
-  replace(/^Urs Holzle$/, 'Urs Hölzle').
-  replace(/^Wichary$/, 'Marcin Wichary').
-  replace(/^Wilson$/, 'Chris Wilson').
-  replace(/^Wolff$/, 'Wolff Dobson').
-  replace(/^Yossi$/, 'Yossi Elkrief');
+    replace('Chris Dibona', 'Chris DiBona').
+    replace('Colt Mcanlis', 'Colt McAnlis').
+    replace('John Mccutchan', 'John McCutchan').
+    replace('John Mcgowan', 'John McGowan').
+    replace('Kc Austin', 'KC Austin').
+    replace('Mcnulty', 'McNulty').
+    replace('Pete Beverloo', 'Peter Beverloo').
+    replace('Pete Lepage', 'Pete LePage').
+    replace('Rich Hyndman', 'Richard Hyndman').
+    replace('Richard Felcher', 'Richard Fulcher').
+    replace('Richard Hyman', 'Richard Hyndman').
+    replace('Tv Raman', 'TV Raman').
+    replace(/^Aleksey$/, 'Alexis Moussine-Pouchkine').
+    replace(/^Alexis Moussine Pouchkine$/, 'Alexis Moussine-Pouchkine').
+    replace(/^Bidelman$/, 'Eric Bidelman').
+    replace(/^Bjorn$/, 'Björn Melinder').
+    replace(/^Brin$/, 'Sergey Brin').
+    replace(/^Colt Mcanis$/, 'Colt McAnlis').
+    replace(/^Cromwell$/, 'Ray Cromwell').
+    replace(/^Dan$/, 'Dan Galpin').
+    replace(/^Divya Mannian$/, 'Divya Manian').
+    replace(/^Feldman$/, 'Pavel Feldman').
+    replace(/^Fette$/, 'Ian Fette').
+    replace(/^Fisher$/, 'Darin Fisher').
+    replace(/^Grace$/, 'Grace Kloba').
+    replace(/^Glazkov$/, 'Dimitri Glazkov').
+    replace(/^Gundotra$/, 'Vic Gundotra').
+    replace(/^Ilya$/, 'Ilya Grigorik').
+    replace(/^Irish$/, 'Paul Irish').
+    replace(/^Jake$/, 'Jake Archibald').
+    replace(/^Justin$/, 'Justin Uberti').
+    replace(/^Kay$/, 'Erik Kay').
+    replace(/^Larry$/, 'Larry Page').
+    replace(/^Malanet$/, 'Mallinath Bareddy').
+    replace(/^Matthew Gaunt$/, 'Matt Gaunt').
+    replace(/^Matt MCneill$/, 'Matt McNeill').
+    replace(/^Mc$/, 'MC').
+    replace(/^Natasha$/, 'Natasha Rooney').
+    replace(/^Nick$/, 'Nick Butcher').
+    replace(/^Nurik$/, 'Roman Nurik').
+    replace(/^Pamela$/, 'Pamela Fox').
+    replace(/^Papakipos$/, 'Matt Papakipos').
+    replace(/^Per$/, 'Per Emanuelsson').
+    replace(/^Pete Lapage$/, 'Pete LePage').
+    replace(/^Rahul$/, 'Rahul Roy-chowdhury').
+    replace(/^Raman$/, 'TV Raman').
+    replace(/^Ray$/, 'Ray Punyabrata').
+    replace(/^Roman$/, 'Roman Nurik').
+    replace(/^Roomann-Kurrik$/, 'Arne Roomann-Kurrik').
+    replace(/^Sam$/, 'Sam Dutton').
+    replace(/^Schmidt$/, 'Eric Schmidt').
+    replace(/^Shanee Nistry$/, 'Shanee Nishry').
+    replace(/^Shanee$/, 'Shanee Nishry').
+    replace(/^Souder$/, 'Steve Souders').
+    replace(/^Souders$/, 'Steve Souders').
+    replace(/^Sparky$/, 'Sparky Rhode').
+    replace(/^Terrence$/, 'Terrence Eden').
+    replace(/^Todd$/, 'Todd Kerpelman').
+    replace(/^Tom$/, 'Tommy Widenflycht').
+    replace(/^Urs Hlzle$/, 'Urs Hölzle').
+    replace(/^Urs Hoelzle$/, 'Urs Hölzle').
+    replace(/^Urs Holzle$/, 'Urs Hölzle').
+    replace(/^Wichary$/, 'Marcin Wichary').
+    replace(/^Wilson$/, 'Chris Wilson').
+    replace(/^Wolff$/, 'Wolff Dobson').
+    replace(/^Yossi$/, 'Yossi Elkrief');
 }
 
 var ignoredspeakers = ['Audience', 'Audience member', 'Male Speaker',
@@ -550,7 +550,8 @@ function isSpeakerAllowed(speaker) {
   return ignoredspeakers.indexOf(speaker) === -1;
 }
 
-// from stackoverflow.com/questions/17200640/javascript-capitalize-first-letter-of-each-word-in-a-string-only-if-lengh-2?rq=1
+// from stackoverflow.com/questions/17200640/javascript-capitalize-first-letter-
+// of-each-word-in-a-string-only-if-lengh-2?rq=1
 function capitalize(string) {
   return string.toLowerCase().replace(/\b[a-z](?=[a-z]+)/g, function(letter) {
     return letter.toUpperCase();
@@ -559,24 +560,24 @@ function capitalize(string) {
 
 function tweakText(text) {
   return text.replace(/ - /gm, ' &mdash; ').
-  replace(urlRegex, '<a href="$1">$1</a>').
-  replace(/ (g.co[\/a-z\d-+]+)/gm, ' <a href="https://$1">$1</a>').
-  replace(/>https?:\/\//gm, '>').
-  replace(/\/</gm, '<').
-  replace(/\n- /gm, '<br>• ').
-  replace(/\\n- /gm, '<br>• ').
-  replace(/(\r)?\n/gm, '<br>').
-  replace(/(\\r)?\\n/gm, '<br>').
-  replace(/&gt;&gt; ?/gm, '').
-  replace(/&amp;gt;&amp;gt; ?/gm, '').
-  replace(/&amp;gt; ?/gm, '').
-  replace(/^>+/gm, '').
-  replace(/&#39;/gm, '\'').
-  replace(/&amp;#39;/gm, '\'').
-  replace(/&quot;/gm, '\'').
-  replace(/--/gm, ' &mdash; ').
-  replace(/ - /gm, ' &mdash; ').
-  replace(/\s{2,}/gm, ' ');
+    replace(urlRegex, '<a href="$1">$1</a>').
+    replace(/ (g.co[/a-z\d-+]+)/gm, ' <a href="https://$1">$1</a>').
+    replace(/>https?:\/\//gm, '>').
+    replace(/\/</gm, '<').
+    replace(/\n- /gm, '<br>• ').
+    replace(/\\n- /gm, '<br>• ').
+    replace(/(\r)?\n/gm, '<br>').
+    replace(/(\\r)?\\n/gm, '<br>').
+    replace(/&gt;&gt; ?/gm, '').
+    replace(/&amp;gt;&amp;gt; ?/gm, '').
+    replace(/&amp;gt; ?/gm, '').
+    replace(/^>+/gm, '').
+    replace(/&#39;/gm, '\'').
+    replace(/&amp;#39;/gm, '\'').
+    replace(/&quot;/gm, '\'').
+    replace(/--/gm, ' &mdash; ').
+    replace(/ - /gm, ' &mdash; ').
+    replace(/\s{2,}/gm, ' ');
 }
 
 function elapsed() {

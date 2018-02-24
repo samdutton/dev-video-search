@@ -20,7 +20,7 @@ limitations under the License.
 
 // For testing
 var baseUrl = location.host === 'localhost' ?
-  'http://localhost:8080' : 'http://www.shearch.me';
+  'http://localhost:8080' : 'https://shearch.herokuapp.com';
 
 var infoElement = document.getElementById('info');
 var nextPageElement = document.getElementById('nextPage');

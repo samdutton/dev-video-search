@@ -32,7 +32,7 @@ var SEARCHLIMIT = 10;
 // var CUSTOMLIMIT = 50;
 
 // to handle requests for video data or transcript, given an ID
-// e.g. shearch.me/p2HzZkd2A40 or shearch.me/t/2UKPRbrw3Kk,p2HzZkd2A40
+// e.g. shearch.me/p2HzZkd2A40 or  https://shearch.herokuapp.com/t/2UKPRbrw3Kk,p2HzZkd2A40
 // view URLs
 var allFieldsViewUrl = dbUrl + '_view/all?include_docs=true&keys=';
 var transcriptViewUrl = dbUrl + '_view/transcript?keys=';
@@ -72,9 +72,10 @@ function handleRequest() {
   console.log('\n>>>> Request from client: ' + url);
 
   // to handle requests for video data or transcript, given an ID
-  // e.g. shearch.me/p2HzZkd2A40 or shearch.me/t/2UKPRbrw3Kk,p2HzZkd2A40
+  // e.g.  https://shearch.herokuapp.com/p2HzZkd2A40 or
+  // or https://shearch.herokuapp.com/t/2UKPRbrw3Kk,p2HzZkd2A40
   var allViewMatches =
-    url.match(/^\/([^=?\/]+)$/);
+    url.match(/^\/([^=?/]+)$/);
   var transcriptViewMatches =
     url.match(/^\/(?:t|transcript|captions)?\/([^?]+)$/);
 
@@ -102,12 +103,12 @@ function handleRequest() {
       // database counts have to be done with string fields
       // these have names like viewCountString and durationSecondsString
       queryObject[countProp] = queryObject[countProp].
-      replace(/comments?/, 'commentCountString').
-      replace(/dislikes?/, 'dislikeCountString').
-      replace(/duration/, 'durationSecondsString').
-      replace(/favou?rites?/, 'favoriteCountString').
-      replace(/likes?/, 'likeCountString').
-      replace(/views?/, 'viewCountString');
+        replace(/comments?/, 'commentCountString').
+        replace(/dislikes?/, 'dislikeCountString').
+        replace(/duration/, 'durationSecondsString').
+        replace(/favou?rites?/, 'favoriteCountString').
+        replace(/likes?/, 'likeCountString').
+        replace(/views?/, 'viewCountString');
 
       // if there is a query as well as a count parameter
       if (Object.keys(queryObject).length > 1) {
@@ -128,7 +129,6 @@ function handleRequest() {
 
     console.log('>>>>> query: ' + query);
   }
-
 }
 
 function tweakText(query) {
@@ -137,31 +137,31 @@ function tweakText(query) {
   // bookmark parameter is added separately to avoid quotes being added
   // as they are for other paramaters
   query = query.replace(/&?count(all)?=\w+/, ''). // added from queryObject
-  replace(/&?bookmark=[\w-]+/, ''). // added from queryObject
-  replace(/&?sort=[%\w-]+/, ''). // added in doDatabaseRequest(), < > escaped
-  // check for ?q=foo queries (which should match any field)
-  replace(/\bq=([^&\|]+)/,
-    '(transcript=$1|description=$1|speakers=$1|title=$1|id=$1)').
-  // attempts to fix spaces and quotes in requests
-  replace(/(\w+) ?%3C ?(\d+)/g, '$1:[0 TO $2]').
-  replace(/(\w+) ?%3E ?(\d+)/g, '$1:[$2 TO Infinity]').
-  // remove cruft from start
-  replace('/?', '').
-  // shortcuts
-  replace(/\b(c=)/, 'transcript=').
-  replace(/\b(captions=)/, 'transcript=').
-  replace(/\b(d=)/, 'description=').
-  replace(/\b(s=)/, 'speakers=').
-  replace(/\b(speaker=)/, 'speakers='). // easy mistake
-  replace(/\b(t=)/, 'title=').
-  // quote all query values to allow spaces in queries
-  replace(/=([^&)|]+)/gm, '="$1"').
-  // replace(/&?from=[^&%]+/g, '').
-  // replace(/&?to=[^&%]+/g, '').
-  // Cloudant uses OR, AND (and : instead of =)
-  replace(/\|{1,2}/g, '+OR+').
-  replace(/&/g, '+AND+').
-  replace(/=/g, ':');
+    replace(/&?bookmark=[\w-]+/, ''). // added from queryObject
+    replace(/&?sort=[%\w-]+/, ''). // added in doDatabaseRequest(), < > escaped
+    // check for ?q=foo queries (which should match any field)
+    replace(/\bq=([^&|]+)/,
+      '(transcript=$1|description=$1|speakers=$1|title=$1|id=$1)').
+    // attempts to fix spaces and quotes in requests
+    replace(/(\w+) ?%3C ?(\d+)/g, '$1:[0 TO $2]').
+    replace(/(\w+) ?%3E ?(\d+)/g, '$1:[$2 TO Infinity]').
+    // remove cruft from start
+    replace('/?', '').
+    // shortcuts
+    replace(/\b(c=)/, 'transcript=').
+    replace(/\b(captions=)/, 'transcript=').
+    replace(/\b(d=)/, 'description=').
+    replace(/\b(s=)/, 'speakers=').
+    replace(/\b(speaker=)/, 'speakers='). // easy mistake
+    replace(/\b(t=)/, 'title=').
+    // quote all query values to allow spaces in queries
+    replace(/=([^&)|]+)/gm, '="$1"').
+    // replace(/&?from=[^&%]+/g, '').
+    // replace(/&?to=[^&%]+/g, '').
+    // Cloudant uses OR, AND (and : instead of =)
+    replace(/\|{1,2}/g, '+OR+').
+    replace(/&/g, '+AND+').
+    replace(/=/g, ':');
 
   // fuzzy matching doesn't work with quotes
   if (query.indexOf('~') !== -1) {
@@ -185,21 +185,21 @@ function dateReplace(query) {
   var unixTo = Date.parse(to);
 
   if (from && !to) {
-    query = query.replace(/(&?)(from=[^&%\)\|]+)/, '$1publishedAtUnix:[' +
+    query = query.replace(/(&?)(from=[^&%)|]+)/, '$1publishedAtUnix:[' +
       unixFrom + ' TO Infinity]');
   }
 
   if (to && !from) {
-    query = query.replace(/(&?)(to=[^&%\)\|]+)/, '$1publishedAtUnix:[0 TO ' +
+    query = query.replace(/(&?)(to=[^&%)|]+)/, '$1publishedAtUnix:[0 TO ' +
       unixTo +
       ']');
   }
 
   if (from && to) {
-    query = query.replace(/(&?)from=[^&%\)\|]+/, '$1publishedAtUnix:[' +
+    query = query.replace(/(&?)from=[^&%)|]+/, '$1publishedAtUnix:[' +
       unixFrom +
       ' TO ' + unixTo + ']').
-    replace(/&to=[^&%\)\|]+/, '');
+      replace(/&to=[^&%)|]+/, '');
   }
   return query;
 }
@@ -223,8 +223,8 @@ function doDatabaseRequest(query, customUrl) {
 
   requestModule({
     uri: requestUrl
-  }, function(error, response, body) {
-    if (!error && response.statusCode === 200) {
+  }, function(error, moduleResponse, body) {
+    if (!error && moduleResponse.statusCode === 200) {
       respondToClient(body, customUrl);
     } else {
       console.log('Request error: ', error, body);
@@ -240,9 +240,9 @@ function respondToClient(body, customUrl) {
   var bodyObject = JSON.parse(body);
 
   // customUrl means a request for a database view, not search
-  // e.g. shearch.me/p2HzZkd2A40 or shearch.me/t/2UKPRbrw3Kk,p2HzZkd2A40
+  // e.g. shearch.herokuapp.com/p2HzZkd2A40
+  // or shearch.herokuapp.com/t/2UKPRbrw3Kk,p2HzZkd2A40
   if (customUrl) {
-
     var countsObject;
     if (queryObject.count) {
       countsObject = bodyObject.counts[queryObject.count];
@@ -292,7 +292,7 @@ function respondToClient(body, customUrl) {
 
   // add <em> for search term
   // messes up links – removed for the moment
-  //  body = body.replace(new RegExp('(' + searchTerm + ')', 'gi'), '<em>$1</em>');
+  // body=body.replace(new RegExp('(' + searchTerm + ')', 'gi'), '<em>$1</em>');
 
   var videos = [];
   for (i = 0; i !== bodyObject.rows.length; ++i) {
@@ -306,7 +306,7 @@ function respondToClient(body, customUrl) {
         delete row.fields.captions;
       }
     }
-    // Cloudant search returns single items as a string, not a single-item array :(
+    // Cloudant search returns single items as strings not single-item array :(
     if (row.fields.speakers && typeof row.fields.speakers === 'string') {
       row.fields.speakers = [row.fields.speakers];
     }
@@ -318,9 +318,10 @@ function respondToClient(body, customUrl) {
   }
 
   var params = {
-    //jscs:disable
+    // jscs:disable
+    // IIRC this needs to be as it is :/
     totalResults: bodyObject['total_rows'], // jshint ignore:line
-    //jscs:enable
+    // jscs:enable
     resultsPerPage: SEARCHLIMIT,
     bookmark: bodyObject.bookmark,
     videos: videos
