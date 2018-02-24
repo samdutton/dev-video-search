@@ -32,7 +32,8 @@ var SEARCHLIMIT = 10;
 // var CUSTOMLIMIT = 50;
 
 // to handle requests for video data or transcript, given an ID
-// e.g. shearch.me/p2HzZkd2A40 or  https://shearch.herokuapp.com/t/2UKPRbrw3Kk,p2HzZkd2A40
+// e.g. https://shearch-me.herokuapp.com/p2HzZkd2A40
+// or https://shearch-me.herokuapp.com/t/2UKPRbrw3Kk,p2HzZkd2A40
 // view URLs
 var allFieldsViewUrl = dbUrl + '_view/all?include_docs=true&keys=';
 var transcriptViewUrl = dbUrl + '_view/transcript?keys=';
@@ -72,8 +73,8 @@ function handleRequest() {
   console.log('\n>>>> Request from client: ' + url);
 
   // to handle requests for video data or transcript, given an ID
-  // e.g.  https://shearch.herokuapp.com/p2HzZkd2A40 or
-  // or https://shearch.herokuapp.com/t/2UKPRbrw3Kk,p2HzZkd2A40
+  // e.g.  https://shearch-me.herokuapp.com/p2HzZkd2A40 or
+  // or https://shearch-me.herokuapp.com/t/2UKPRbrw3Kk,p2HzZkd2A40
   var allViewMatches =
     url.match(/^\/([^=?/]+)$/);
   var transcriptViewMatches =
@@ -240,8 +241,8 @@ function respondToClient(body, customUrl) {
   var bodyObject = JSON.parse(body);
 
   // customUrl means a request for a database view, not search
-  // e.g. shearch.herokuapp.com/p2HzZkd2A40
-  // or shearch.herokuapp.com/t/2UKPRbrw3Kk,p2HzZkd2A40
+  // e.g. shearch-me.herokuapp.com/p2HzZkd2A40
+  // or shearch-me.herokuapp.com/t/2UKPRbrw3Kk,p2HzZkd2A40
   if (customUrl) {
     var countsObject;
     if (queryObject.count) {

@@ -4,7 +4,7 @@ This is a Node app that provides an API to get data from the database (stored by
 
 For testing, you can run this locally with the app running from localhost.
 
-The live version runs on [Nodejitsu](https://www.nodejitsu.com/) at shearch.me, for queries like this: [shearch.me?captions=svg&speaker=alex](http://shearch.me/?captions=svg&speaker=alex) (same as [shearch.me?c=svg&s=alex](http://shearch.me/?c=svg&s=alex)).
+The live version runs on [Nodejitsu](https://www.nodejitsu.com/) at shearch-me.herokuapp.com, for queries like this: [shearch-me.herokuapp.com?captions=svg&speaker=alex](https://shearch-me.herokuapp.com /?captions=svg&speaker=alex) (same as [shearch-me.herokuapp.com ?c=svg&s=alex](https://shearch-me.herokuapp.com/?c=svg&s=alex)).
 
 For more examples, see this repo's [README](https://github.com/GoogleChrome/dev-video-search/blob/master/README.md).
 

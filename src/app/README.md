@@ -1,6 +1,6 @@
 # Search Google developer videos
 
-This directory includes code for a sample app that uses the [shearch.me get](https://github.com/GoogleChrome/dev-video-search/tree/master/src/get) API to search  transcripts and data from [Google Developers](https://www.youtube.com/user/GoogleDevelopers), [Android Developers](https://www.youtube.com/user/androiddevelopers) and [Chrome Developers](https://www.youtube.com/user/ChromeDevelopers).
+This directory includes code for a sample app that uses the [shearch-me.herokuapp.com get](https://github.com/GoogleChrome/dev-video-search/tree/master/src/get) API to search  transcripts and data from [Google Developers](https://www.youtube.com/user/GoogleDevelopers), [Android Developers](https://www.youtube.com/user/androiddevelopers) and [Chrome Developers](https://www.youtube.com/user/ChromeDevelopers).
 
 You can try it out at [simpl.info/s](http://simpl.info/s):
 

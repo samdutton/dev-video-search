@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/samdutton/devsearch.git"
+    "url": "https://github.com/samdutton/dev-video-search.git"
   },
   "keywords": [
     "AndroidDevelopers",
@@ -24,13 +24,12 @@
   "author": "Sam Dutton",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/samdutton/devsearch/issues"
+    "url": "https://github.com/samdutton/dev-video-search/issues"
   },
-  "homepage": "https://github.com/samdutton/devsearch",
+  "homepage": "https://github.com/samdutton/dev-video-search",
   "subdomain": "shearch",
   "domains": [
-    "shearch.me",
-    "www.shearch.me"
+    "shearch-me.herokuapp.com"
   ],
   "engines": {
     "node": "6.10.2"

@@ -37,10 +37,10 @@ if (videoId) {
     'simpl.info/s/t?id=ngBy0H_q-GY');
 }
 
-function getAndDisplayTranscript(videoId) {
+function getAndDisplayTranscript(id) {
   var baseUrl = location.host === 'localhost' ? // to enable testing
-  'http://localhost:8080' : ' https://shearch.herokuapp.coms';
-  var url = baseUrl + '/' + videoId;
+    'http://localhost:8080' : ' https://shearch-me.herokuapp.coms';
+  var url = baseUrl + '/' + id;
   var xhr = new XMLHttpRequest();
   xhr.open('GET', url);
   xhr.onreadystatechange = function() {
@@ -58,11 +58,10 @@ function getAndDisplayTranscript(videoId) {
 }
 
 function handleTranscriptRequest(results) {
-
   for (var i = 0; i !== results.length; ++i) {
     var video = results[i];
-    var videoId = video.id;
-    videos[videoId] = {
+    var id = video.id;
+    videos[id] = {
       currentTime: 0,
       id: videoId,
       startTimes: []
@@ -155,10 +154,10 @@ function initPolling(video) {
   }, 100);
 }
 
-function addTranscriptClickHandler(span, videoId) {
+function addTranscriptClickHandler(span, id) {
   var start = span.getAttribute('data-start');
   span.title = start;
   span.onclick = function() {
-    videos[videoId].player.seekTo(Math.round(start));
+    videos[id].player.seekTo(Math.round(start));
   };
 }
