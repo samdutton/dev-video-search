@@ -1,21 +1,38 @@
 {
-  "name": "shearch-me",
+  "name": "shearch",
   "version": "1.0.0",
-  "description": "API for searching Google developer videos",
+  "description": "Search developer videos",
   "main": "index.js",
-  "dependencies": {},
-  "devDependencies": {},
+  "dependencies": {
+    "googleapis": "^1.1.4",
+    "request": "^2.53.0"
+  },
   "scripts": {
     "start": "node index.js",
     "test": "node index.js"
   },
   "repository": {
     "type": "git",
-    "url": "github.com/samdutton/dev-video-search"
+    "url": "https://github.com/samdutton/devsearch.git"
   },
   "keywords": [
-    "google"
+    "AndroidDevelopers",
+    "Chrome",
+    "Google",
+    "GoogleDevelopers"
   ],
-  "author": "samdutton",
-  "license": "ISC"
+  "author": "Sam Dutton",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/samdutton/devsearch/issues"
+  },
+  "homepage": "https://github.com/samdutton/devsearch",
+  "subdomain": "shearch",
+  "domains": [
+    "shearch.me",
+    "www.shearch.me"
+  ],
+  "engines": {
+    "node": "6.10.2"
+  }
 }

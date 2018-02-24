@@ -280,7 +280,7 @@ function getTranscript(index, useAlternativeUrl) {
   }
 }
 
-function handleTranscript(error, response, body, index, transcriptUrl) { // jshint ignore:line
+function handleTranscript(error, response, body, index, transcriptUrl) {
   var video = videos[index];
   if (error /* || (response && response.statusCode !== 200) */) {
     console.log('Retrying to get transcript for ' +
@@ -351,7 +351,7 @@ function tweakTranscriptText(body) {
     handleSpeakerMatch); // build array of speakers
 }
 
-function handleSpeakerMatch(match, submatch1) { // jshint ignore:line
+function handleSpeakerMatch(match, submatch1) {
   // correct and capitalize speaker names (Fred Nerk not FRED NERK)
   var speaker = tweakName(submatch1);
   if (speakers.indexOf(speaker) === -1 && isSpeakerAllowed(speaker)) {
@@ -418,7 +418,6 @@ function insertVideos() {
   var NUMTOINSERT = 100;
 
   for (var begin = 0; begin < videos.length; begin += NUMTOINSERT) {
-    console.log('>>>>> begin: ' + begin);
     var requestBody = {
       'docs': videos.slice(begin, begin + NUMTOINSERT)
     };
@@ -441,7 +440,7 @@ function requestInsert(options) {
   });
 }
 
-function handleBulkInsert(error, response, body, options) { // jshint ignore:line
+function handleBulkInsert(error, response, body, options) {
   if (error || !body.length) {
     console.log('Bulk insert error: ', error);
     if (body) {
@@ -461,11 +460,10 @@ function handleBulkInsert(error, response, body, options) { // jshint ignore:lin
     beep(3, 1000);
     console.log('Complete: inserted ' + numVideoIds + ' videos in ' +
       elapsed() + ' seconds');
-    console.log('>>>>> allSpeakers:\n\n' + allSpeakers);
+    // console.log('>>>>> allSpeakers:\n\n' + allSpeakers);
   } else {
     console.log(numVideosInserted + ' inserted so far');
   }
-
 }
 
 // Utility functions ///////////////////////////////
@@ -545,7 +543,7 @@ var ignoredspeakers = ['Audience', 'Audience member', 'Male Speaker',
   'Female Speaker', 'All', 'Playback', 'Man', 'Announcer', 'Moderator',
   'Producer', 'Fundamentals', 'Female Voice', 'Together', 'Male Voice',
   'Male Speakers', 'Cameraman', 'Unknown Speaker', 'Moderator', 'Remember',
-  'The', 'Describer', 'Caller', 'Offscreen'
+  'The', 'Describer', 'Caller', 'Offscreen', 'Speaker'
 ];
 
 function isSpeakerAllowed(speaker) {
